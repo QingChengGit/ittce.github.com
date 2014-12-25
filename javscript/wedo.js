@@ -327,6 +327,351 @@ jQuery.extend({
 		}
 		return -1;
 	},
-})
 
+	merge: function ( first, second ){
+		var len = +second,
+		j = 0,
+		i = first.length;
+		while ( j < len ){
+			first[ i++ ] = second[ j++ ];
+		}
+
+		if( len !== len ){
+			while( second[j] != void 0 ){
+				first[ i++ ] = second[ j++ ];
+			}
+		}
+		first.length = i;
+		return first;
+	},
+
+	grep: function( elems, callback, invert ){
+		var callbackInverse,
+		matches = [],
+		i = 0,
+		length = elems.length,
+		callbackExpect = !invert;
+
+		for( ; i < length; i++ ){
+			callbackInverse = !callback( elems[ i ], i );
+			if( callbackInverse !== callbackExpect ){
+				matches.push( elems[ i ] );
+			}
+		}
+		return matches;
+	},
+
+	map: function( elems, callback, arg ){
+		var value,
+		i = 0,
+		length = elems.length,
+		isArray = isArraylike( elems ),
+		ret = [];
+
+		if( isArray ){
+			for( ; i < length; i++ ){
+				value = callback( elems[ i ], i, arg);
+
+				if( value != null ){
+					ret.push( value );
+				}
+			}
+		} else {
+			for( i in elems ){
+				value = callback( elems[ i ], i , arg );
+
+				if( value != null ){
+					ret.push( value );
+				}
+			}
+		}
+		return concat.apply( [], ret );
+	},
+
+	guid: 1,
+
+	proxy: function( fn, context ){
+		var args, proxy, tmp;
+
+		if( typeof context === 'string' ) {
+			tmp = fn[ context ];
+			context = fn;
+			fn = tmp;
+		}
+
+		if( !jQuery.isFunction( fn )){
+			return undefined;
+		}
+
+		args = slice.call( arguments, 2 );
+		proxy = function() {
+			return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
+
+		};
+		proxy.guid = fn.guid = fn.guid || jQuery.guid++;
+		return proxy;
+	},
+
+	now: function() {
+		return +( new Date() );
+	},
+	support: support
+});
+
+jQuery.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),
+	function( i, name) {
+		class2type[ "[object" + name + "]" ] = name.toLowerCase();
+	});
+function isArraylike( obj ){
+	var length = obj.length,
+		type = jQuery.type( obj );
+	if( type === "function" || jQuery.isWindow( obj ) ) {
+		return false;
+	}
+
+	if( obj.nodeType === 1 && length) {
+		return true;
+	}
+	return type === "array" || length === 0 ||
+		typeof length === "number" && length > 0 && ( length - 1 ) in obj;
+}
+
+var Sizzle = ( function( window ) {
+	var i,
+		support,
+		getText,
+		isXML,
+		tokenize,
+		compile,
+		select,
+		outermostContext,
+		sortInput,
+		hasDuplicate,
+
+		setDocument,
+		document,
+		docElem,
+		documentIsHTML,
+		rbuggyQSA,
+		rbuggyMatches,
+		matches,
+		contains,
+
+		expando = "sizzle" + 1 * new Date();
+		preferredDoc = window.document,
+		dirruns = 0, 
+		done = 0,
+		classCache = createCache(),
+		tokenCache = createCache(),
+		compilerCache = createCache(),
+		sortOrder = function( a, b ){
+			if( a === b ){
+				hasDuplicate = true;
+			}
+			return 0;
+		},
+
+		MAX_NEGATIVE = 1 << 31,
+
+		hasOwn = ({}).hasOwnPrototype,
+		arr = [],
+		pop = arr.pop,
+		push_native = arr.push,
+		push = arr.push,
+		slice = arr.slice,
+
+		indexOf = function( list, elem ){
+			var i = 0;
+			len = list.length;
+			for( ; i < length ++i ){
+				if( list[i] === elem ){
+					return i;
+				}
+			}
+			return -1;
+		},
+
+		booleans = "checked|selected|async|autofocus|autoplay|controls|defer|disabled|hidden|ismap|loop|multiple|open|readonly|required|scoped",
+
+		whitespace = "[\\x20\\t\\r\\n\\f]",
+
+		characterEncoding = "(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+",
+
+		identifier = characterEncoding.replace( "w", "w#" ),
+
+		attributes = "\\[" + whitespace + "*(" + characterEncoding + ")(?:" + whitespace +
+			"*([*^$|!~]?=)" + whitespace +
+			"*(?:'((?:\\\\.|[^\\\\'])*)'|\"((?:\\\\.|[^\\\\\"])*)\"|(" + identifier +"))|)" + whitespace +
+			"*\\]",
+
+		pseudos = ":(" + characterEncoding +")(?:\\(("+
+			"('((?:\\\\.|[^\\\\'])*'|\"((?:\\\\.|[^\\\\\"])*)\")|"+
+			"((?:\\\\.|[^\\\\()[\\]]|"+ attributes + ")*)|"+
+			".*"+
+			")\\)|)",
+		rwhitespace = new RegExp( whitespace + "+", "g"),
+		rtrim = new RegExp( "^" + whitespace + "+|((?:^|[^\\\\])(?:\\\\.)*)" + whitespace + "+$", "g" ),
+		
+		rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*"),
+		rcombinators = new RegExp( "^" + whitespace + "*([>+~]|" + whitespace +")" + whitespace + "*" ),
+
+		rattributeQuotes = new RegExp( "=" + whitespace + "*([^\\]'\"]*?)" + whitespace + "*\\]", "g" ),
+
+		rpseudo = new RegExp( pseudos ),
+		ridentifier = new RegExp( "^" + identifier + "$" ),
+
+		matchExpr = {
+			"ID" : new RegExp( "^#(" + characterEncoding + ")" ),
+			"CLASS": new RegExp( "^\\.(" + characterEncoding + ")" ),
+			"TAG": new RegExp( "^(" + characterEncoding.replace( "w", "w*") +")"),
+			"ATTR": new RegExp( "^"+attributes ),
+			"PSEUDO": new RegExp( "^" + pseudos),
+			"CHILD": new RegExp( "^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\("+ whitespace +
+				"*(even|odd|(([+-]|)(\\d*)n|)" + whitespace + "*(?:([+-]|)" + whitespace +
+				"*(\\d+)|))" + whitespace + "*\\)|)", "i" ),
+			"bool": new RegExp( "^(?:" + booleans + ")$", "i" ),
+			"needsContext": new RegExp( "^" + whitespace + "*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\(" +
+				whitespace + "*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" )
+		},
+
+		rinputs = /^(?:input|select|textatea|button)$/i,
+		rheader = /^h\d$/i,
+
+		rnative = /^[^{]+\{\s*\[native \w/,
+		rquickExpr = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,
+
+		rsibiling = /[+~]/,
+		rescape = /'|\\/g,
+
+		runescape = new RegExp( "\\\\([\\da-f]{1,6}" + whitespace + "?|(" +whitespace +")|.)", "ig"),
+
+		funescape = function( _, escaped, escapedWhitespace ){
+			var high = "0x" + escaped - 0x10000;
+			return high !== high || escapedWhitespace ?
+			escaped :
+			high < 0 ?
+				String.fromCharCode( high + 0x10000 ) :
+				String.fromCharCode( high >> 10| 0xD800, high & 0x3FF | 0xDC00 );
+		},
+
+		unloadHandler = function(){
+			setDocument();
+		};
+
+		try{
+			push.apply(
+				( arr = slice.call( preferredDoc.childNodes )),
+				preferredDoc.childNodes
+			);
+
+			arr[ preferredDoc.childNodes.length ].nodeType;
+		} catch( e ) {
+			push = { apply: arr.length ?
+				function( target, els ){
+					push_native.apply( target, slice.call(els) );
+				}:
+				function( target, els ){
+					var j = target.length,
+						i = 0;
+					while ( (target[j++] = les[i++]) ) {}
+					target.length = j - 1;
+				}
+			};
+		}
+		function Sizzle( selector, context, results, seed ) {
+			var match, elem, m, nodeType,
+				i, groups, old, nid, newContext, newSelector;
+			if( ( context ? context.ownerDocument || context : preferredDoc ) !== document ){
+				setDocument( context );
+			}
+
+			context = context || document;
+			results = results || [];
+			nodeType = context.nodeType;
+			if( typeof selector !== "string" || !selector ||
+				nodeType !== 1 && nodeType !== 9 && nodeType !== 11){
+
+				return results;
+			}
+
+			if( !seed && documentIsHTML ){
+				if( nodeType !== 11 && ( match = requickExpr.exec( selector ) ) ){
+					if( (m = match[1]) ) {
+						if( nodeType === 9 ){
+							elem = context.getElementById( m );
+							if( elem.id === m ){
+								results.push( elem );
+								return results;
+							}
+						} else {
+							return results;
+						}
+					} else {
+						if( context.ownerDocument && (elem = context.ownerDocument.getElementById( m )) && 
+							contains( context, elem ) && elem.id === m) {
+							results.push( elem );
+							return results;							
+						}
+					}
+				} else if ( match[2] ) {
+					push.apply( results, context.getElementsByTagName( selector ) );
+					return results;
+				} else if ( (m = match[3]) && support.getElementsByClassName ){
+					push.apply( results, context.getElementsByClassName( m ) );
+					return results;
+				}
+			}
+
+			if( support.qsa && (!rbuggyQSA || !rbuggyQSA.test( selector )) ) {
+				nid = old = expando;
+				newContext = context;
+				newSelector = nodeType !== 1 && selector;
+
+				if( (old = context.getAttribute("id")) ) {
+					nid = old.replace( rescape , "\\$&" );
+				} else {
+					context.setAttribute( "id", nid );
+				}
+				nid = "[id='" + nid + "']";
+
+				i = groups.length;
+				while( i-- ){
+					groups[i] = nid + toSelector( groupsp[i] );
+				}
+
+				newContext = rsibiling.test( selector ) && testContext( context.parentNode ) || context ;
+				newSelector = groups.join(',');
+			}
+
+			if( newSelector ){
+				try{
+					push.apply( results, 
+						newContext.querySelectorAll( newSelector )
+					);
+					return results;
+				} catch( qsaError ){
+
+				} finally{
+					if( !old ){
+						context.removeAttribute("id");
+					}
+				}
+			}
+		}
+	}
+	return select( selector.replace( rtrim, "$1"), context, results, seed );
+}
+
+function createCache(){
+	var keys = [];
+
+	function cache( key, value ){
+		if( keys.push( key + " " ) > Expr.cacheLength ){
+			delete cache[ keys.shift() ];
+		}
+		return (cache[ key + " " ] = value);
+	}
+	return cache;
+}
+})
 }))
