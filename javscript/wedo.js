@@ -841,7 +841,53 @@ setDocument = Sizzle.setDocument = function( node ){
 		}
 	}
 
-	//there
+	//there  Tag
+	Expr.find["TAG"] = support.getElementsByTagName ?
+		function( tag, context ){
+			if( context.getElementsByTagName !== "undefined" ){
+				return context.getElementsByTagName( tag );
+			} else if( support.qsa ){
+				return context.querySelectorAll( tag );
+			}
+		}:
+		function ( tag, context ){
+			var elem,
+				tmp = [],
+				i = 0,
+				result = context.getElementsByTagName( tag );
+			if( tag === "*" ){
+				while( (elem = result[i++]) ){
+					if( elem.nodeType === 1 ) {
+						tmp.push(elem)
+					}
+				}
+				return tmp;
+			}
+			return result;
+		}
+	//CLASS
+
+	Expr.find["CLASS"] = support.getElementsByClassName && function( className, context ){
+		if( documentIsHTML ){
+			return context.getElementsByClassName( className );
+		}
+	};
+
+	rbuggyMatches = [];
+	rbuggyQSA = [];
+
+	if( ( support.qsa = rnative.test( doc.querySelectorAll ) ) ){
+		assert(function( div ){
+			docElem.appendChild( div).innerHTML = "<a id='" +expando +"'></a>"+
+				"<select id='" +expando+ "-\f]' msallowcaptrue=''>"+
+				"<option selected=''></option></select>";
+			if( div.querySelectorAll("[msallowcaptrue^='']").length ){
+				rbuggyQSA.push("[*^$]="+whitespace+"*(?:''|\"\")");
+			}
+			//markdown
+		})
+	}
+
 
 }
 })
