@@ -1,6 +1,6 @@
 //仿写下jQuery;加深下对js的理解
 (function ( global, factory ){
-	
+	//这里是针对一些没有window和docuemnt对象的js环境;
 	if( typeof module === 'object' && typeof module.exports === 'object' ){
 		module.exprots = global.document ? 
 		factory( global, true ):
@@ -9,42 +9,46 @@
 				throw new Error( "jQuery requires  a window with a document");
 			}
 			return factory( w );
-		}else{
-			factory( global );
 		}
-	}
-}( typeof window !== 'undefined' ? window : this, factory( window, noGlobal ){
-	var deletedIds = [];
+	}else {
+        factory( global );
+    }
+}( typeof window !== 'undefined' ? window : this, factory( window, noGlobal )
+{
+    //保存一个默认的数组；将数组的方法挂在此数组下
+    var deletedIds = [];
 
-	var slice = deletedIds.slice;
+    var slice = deletedIds.slice;
 
-	var concat = deletedIds.concat;
+    var concat = deletedIds.concat;
 
-	var push = deletedIds.push;
+    var push = deletedIds.push;
 
-	var indexOf = deletedIds.indexOf;
+    var indexOf = deletedIds.indexOf;
 
-	var class2type = {};
+    var class2type = {};
 
-	var hasOwn = class2type.hasOwnPrototype;
+    var hasOwn = class2type.hasOwnPrototype;
 
-	var support = {};
+    var support = {};
 
-	var 
-		version = '1.11.2',
+    var
+        version = '1.11.2',
 
-		jQuery = function ( selector, context ){
-			return new jQuery.fn.init( selector, context );
-		},
+        jQuery = function (selector, context) {
+            return new jQuery.fn.init(selector, context);
+        },
 
-		rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
+        rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
 
-		rmsPrefix = /^-ms-/,
-		rdashAlpha = /-([\da-z])/gi,
+        rmsPrefix = /^-ms-/,
+        rdashAlpha = /-([\da-z])/gi,
 
-		fcamelCase = function( all, letter ){
-			return letter.toUpperCase();
-		};
+        fcamelCase = function (all, letter) {
+            return letter.toUpperCase();
+        };
+
+
 jQuery.fn = jQuery.prototype = {
 	jquery : version,
 
@@ -64,9 +68,10 @@ jQuery.fn = jQuery.prototype = {
 	},
 
 	pushStack : function ( elems ) {
+        //基于merge函数，merge是将两个数组合并;
 		var ret = jQuery.merge( this.constructor(), elems );
 
-		ret.prevObject = this ; //这里存下这个DOM对象，当end()的时候把this改为ret.prevObject;
+        ret.prevObject = this ; //这里存下这个DOM对象，当end()的时候把this改为ret.prevObject;
 
 		ret.context = this.context;
 
@@ -86,45 +91,57 @@ jQuery.fn = jQuery.prototype = {
 	slice : function(){
 		return this.pushStack ( slice.apply( this, arguments ) );
 	},
-
+    //基于eq方法实现自身
 	first : function(){
 		return this.eq( 0 );
 	},
+    //基于eq方法实现自身
 	last : function(){
 		return this.eq( -1 );
 	},
 	eq: function( i ) {
 		var len = this.length,
 		j = + i+ ( i < 0 ? len : 0);
+        //j = 索引+(所以小于0的话+len就变成从后查找了，否则正续查找）
 		return this.pushStack( j >= 0 && j < len ? [ this[ j ] ] : [] );
+        //如果满足条件也就是说j不是非法的就将this[j]找个dom对象pushStack进去;
 	},
 
 	end : function(){
+        //将保存的在this上的prevObject再换给返回出去也就是上一次调用jQuery方法的对象
 		return this.prevObject || this.constructor( null );
 	},
 
+    //将剩余的方法挂在deletedIds这个数组上;
 	push : push,
 	sort : deletedIds.sort,
 	splice : deletedIds.splice
 };
 
 jQuery.extend = jQuery.fn.extend = function() {
-	var src, copyIsArray, copy, name, options, clone, 
-	target = arguments[ 0 ] || {},
+	var src, copyIsArray, copy, name, options, clone,
+    //如果没有参数target = {} ; 有的话 target为第一个参数;
+
+    target = arguments[ 0 ] || {},
+    //索引i置为0;
 	i = 1;
+
 	length = arguments.length,
 	deep = false;
-
+    //如果第一个参数为一个boolean的值，将其赋值给deep，然后继续遍历 arguments
 	if( typeof target == 'boolean'){
 		deep = target;
 		target = arguments[ i ] || {};
 		++i;
 	}
 
+    //
 	if( typeof targer !== 'object' && !jQuery.isFunction( target )){
 		target = {};
 	}
 
+    //当只有一个参数将this 赋值给 jQuery或者jQuery.fn赋值给target，取决于使用者调用的方式;这里有两个分支;如果此参数为
+   //boolean时，此时无法进入循环，直接将target return出去;如果此参数不为
 	if( i == length ){
 		target = this;
 		--i;
@@ -416,7 +433,7 @@ jQuery.extend({
 		return +( new Date() );
 	},
 	support: support
-});
+};);
 
 jQuery.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),
 	function( i, name) {
@@ -673,5 +690,37 @@ function createCache(){
 	}
 	return cache;
 }
+
+function markFunction( fn ){
+	fn[ expando ] = true;
+	return fn;
+}
+
+function assert( fn ) {
+	var div = document.createElement("div");
+
+	try{
+		return !!fn( div );
+	} catch ( e ){
+		return false;
+	} finally {
+
+		if( div.parentNode ){
+			div.parentNode.removeChild( div );
+		}
+
+		div = null ;
+	}
+}
+
+function addHandle( attrs, handler ){
+	var arr = attrs.split('|');
+		i = attrs.length;
+
+	while( i-- ){
+		Expr.attrHandle[ arr[i] ] = handler;
+	}
+}
+
 })
 }))
