@@ -13,7 +13,7 @@
 	}else {
         factory( global );
     }
-}( typeof window !== 'undefined' ? window : this, factory( window, noGlobal )
+}( typeof window !== "undefined" ? window : this, function( window, noGlobal )
 {
     //保存一个默认的数组；将数组的方法挂在此数组下
     var deletedIds = [];
@@ -176,29 +176,29 @@ jQuery.extend = jQuery.fn.extend = function() {
 };
 
 jQuery.extend({
-	expando : "jQuery" + ( version + Math.random() ).replace(/\D/g, ""),
+	expando: "jQuery" + ( version + Math.random() ).replace(/\D/g, ""),
 
-	isReady : true,
+	isReady: true,
 
-	error : function( msg ){
+	error: function( msg ){
 		throw new Error( msg );
 	},
 
-	noop : function() {},
+	noop: function() {},
 
-	isFucntion : fucntion( obj ){
+	isFunction: function( obj ){
 		return jQuery.type(obj) === "function";
 	},
 
-	isArray : function ( obj ) {
+	isArray: function ( obj ) {
 		return jQuery.type(obj) === 'array';
 	},
 
-	isWindow : function( obj ){
+	isWindow: function( obj ){
 		return obj != null && obj == obj.window;
 	},
 
-	isNumeric : function( obj ){
+	isNumeric: function( obj ){
 		return !jQuery.isArray(obj) && (obj - parseFloat( obj ) + 1) >= 0;
 	},
 
@@ -433,7 +433,7 @@ jQuery.extend({
 		return +( new Date() );
 	},
 	support: support
-};);
+});
 
 jQuery.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),
 	function( i, name) {
@@ -500,7 +500,7 @@ var Sizzle = ( function( window ) {
 		indexOf = function( list, elem ){
 			var i = 0;
 			len = list.length;
-			for( ; i < length ++i ){
+			for( ; i < length; ++i ){
 				if( list[i] === elem ){
 					return i;
 				}
@@ -637,7 +637,7 @@ var Sizzle = ( function( window ) {
 					push.apply( results, context.getElementsByClassName( m ) );
 					return results;
 				}
-			}
+
 
 			if( support.qsa && (!rbuggyQSA || !rbuggyQSA.test( selector )) ) {
 				nid = old = expando;
@@ -675,9 +675,8 @@ var Sizzle = ( function( window ) {
 				}
 			}
 		}
+		return select( selector.replace( rtrim, "$1"), context, results, seed );
 	}
-	return select( selector.replace( rtrim, "$1"), context, results, seed );
-}
 
 function createCache(){
 	var keys = [];
@@ -722,5 +721,128 @@ function addHandle( attrs, handler ){
 	}
 }
 
+function slibingcheck( a, b ){
+	var cur = b && a,
+		diff = cur && a.nodeType === 1 && b.nodeType === 1 &&
+			(~b.sourceIndex || MAX_NEGATIVE)-
+			(~a.sourceIndex || MAX_NEGATIVE);
+	if( diff ){
+		return diff;
+	}
+
+	if( cur ){
+		while( (cur = cur.nextSibling) ){
+			if( cur === b ){
+				return -1;
+			}
+		}
+	}
+	return a ? 1 : -1;
+
+}
+
+function createInputPseudo ( type ){
+	return function( elem ){
+		var name = elem.nodeType.toLowerCase();
+		return name === "input" && elem.type = type;
+	}
+}
+
+function createButtonPseudo( type ){
+	return function( elem ){
+		var name = elem.nodeType.toLowerCase();
+		return ( name === "input" || name === "button" ) && elem.type = type;
+	}
+}
+
+function createPositionalPseudo( type ){
+	return markFunction(function( argument ){
+		argument = +argument;
+		return markFunction( function( seed, matchs ){
+			var j,
+				matchIndexes = fn( [], seed.length, argument),
+				i = matchIndexes.length;
+
+			while( --i ){
+				if( seed[ (j = matechIndexes[i])] ){
+					seed = !( mateches[j] = seed[j] );
+				}
+			}
+		})
+	})
+}
+
+function testContext( context ){
+	return context && typeof context.getElementsByTagName !== "undefined" && context;
+}
+
+support = Sizzle.support ={};
+
+isXML = Sizzle.isXML = function( elem ){
+	var documentElement = elem && (elem.ownerDocument || elem).documentElement;
+	return documentElement ? documentElement.nodeType !== "HTML" : false;
+}
+
+setDocument = Sizzle.setDocument = function( node ){
+	var hasCompare,parent,
+		doc = node ? node.ownerDocument || node : preferredDoc;
+
+	if( doc === document || doc.nodeType !== 9 || !doc.documentElement){
+		return document;
+	}
+
+	doc = document;
+	docElem = doc.documentElement;
+	parent = doc.defaultView;
+
+	if( parent && parent !== parent.top){
+		if( parent.addEventListener ){
+			parent.addEventListener( "unload", unloadHandler,false )
+		} else if( parent.attachEvent ){
+			parent.attachEvent( "onunload", unloadHandler );
+		}
+	}
+
+	documentIsXML = !isXML( doc );
+
+	support.attributes = assert(function( div ){
+		div.appendChild( doc.createElement("") );
+		return !div.getElementsByTagName("*").length;
+	});
+
+	support.getElementsByClassName = rnative.test( doc.getElementsByClassName );
+
+	support.getById =  assert(function( div ){
+		docElem.appendChild( div).id = expando;
+		return !doc.getElementsByName || !doc.getElementsByName( expando).length;
+	});
+
+	if( support.getById ){
+		Expr.find["ID"] = function( id, context ){
+			if(typeof context.getElementById !== "undefined" && documentIsHTML ){
+				var m = context.getElementById( id );
+				return m && m.parentNode ? [m] : [];
+			}
+		};
+		Expr.filter["ID"] = function( id ){
+			var attrId = id.replace( runescape,funescape );
+			return function( elem ){
+				return elem.getAttribute("id") === attrId;
+			}
+		};
+	} else {
+		delete Expr.find["ID"];
+		Expr.filter["ID"] = function( id ){
+			var attrId = id.replace( runescape, funescape );
+			return function( elem ){
+				var node = typeof  elem.getAttributeNode !== "undefined" && elem.getAttributeNode("id");
+				return node && node.value === attrId;
+			}
+		}
+	}
+
+	//there
+
+}
 })
 }))
