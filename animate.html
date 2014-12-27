@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+<style>
+	*{margin:0; padding:0;}
+	div{width:100px;height:100px;background:gold;}
+</style>
+<script src="javascript/easing.js"></script>
+</head>
+
+<body>
+	<div></div>
+	<div id="div1"></div>
+	<script>
+		var a = document.getElementsByTagName('div')[0];
+		function animate( time, callback, type ){
+			var defaultTime = 16;
+			var frames =  Math.ceil(time/defaultTime);
+			var frame = 0;
+			var timer;
+			var startTime = new Date();
+			var x = 0;
+			clearInterval( timer );			
+			timer = setInterval(
+				function(){
+					if( type == "yunsu"){
+						frame ++;
+						x = frame/frames;
+					} else {
+						var currentTime = new Date();
+						x = (currentTime - startTime)/time;
+					}
+					if( x >= 1 ) {
+						clearInterval( timer )
+						x = 1;
+					}
+
+					callback( x );									
+				}
+			,defaultTime);	
+		}
+		function draw( x ){
+			//x = Easing.easeBoth( x );
+			x =  x + ( 1 - x )*0.1;
+			var left =  500*x;
+			a.style.marginLeft = left + 'px'
+		}
+		animate( 1000, function( x ){
+			var oDiv = document.getElementById('div1');
+			var left = 800*x;
+			oDiv.style.marginLeft = left + 'px';
+		})
+		animate( 1000, draw, 'yunsu' );
+	</script>
+</body>
+</html>
