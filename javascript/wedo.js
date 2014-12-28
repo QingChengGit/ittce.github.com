@@ -885,7 +885,39 @@ setDocument = Sizzle.setDocument = function( node ){
 				rbuggyQSA.push("[*^$]="+whitespace+"*(?:''|\"\")");
 			}
 			//markdown
-		})
+			if( !div. querySelectorAll("[selected]").length ){
+				rbuggyQSA.push( "\\[" +whitespace + "*(?:value|" +blooeans +")" );
+			}
+
+			if( !div.querySelectorAll( "[id~=" +expando + "-]").length ){
+				rbuggyQSA.push("~=");
+			}
+
+			if( !div.querySelectorAll(":checked").length ){
+				rbuggyQSA.push(":checked");
+			}
+
+			if( !div.querySelectorAll( "a#" + expando + "+*").length ){
+				rbuggyQSA.push(".#.+[+~]");
+			}
+		});
+
+		assert(function( div ){
+			var input = doc.createElement("input");
+			input.setAttribute("type", "hidden");
+			div.appendChild( input).setAttribute("name","D");
+
+			if( div.querySelectorAll("[name=d]").length ){
+				rbuggyQSA.push( "name" + whitespace + "*[*^$|!~]?=" );
+			}
+
+			if( div.querySelectorAll(":enabled").length ){
+				rbuggyQSA.push( ":enabled", ":disabled" );
+			}
+
+			div.querySelectorAll("*,:x");
+			rbuggyQSA.push(",.*:");
+		});
 	}
 
 
