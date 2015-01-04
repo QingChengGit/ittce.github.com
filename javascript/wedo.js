@@ -743,15 +743,15 @@ function slibingcheck( a, b ){
 
 function createInputPseudo ( type ){
 	return function( elem ){
-		var name = elem.nodeType.toLowerCase();
-		return name === "input" && elem.type = type;
+		var name = elem.nodeName.toLowerCase();
+		return name === "input" && elem.type === type;
 	}
 }
 
 function createButtonPseudo( type ){
 	return function( elem ){
-		var name = elem.nodeType.toLowerCase();
-		return ( name === "input" || name === "button" ) && elem.type = type;
+		var name = elem.nodeName.toLowerCase();
+		return ( name === "input" || name === "button" ) && elem.type === type;
 	}
 }
 
@@ -918,6 +918,18 @@ setDocument = Sizzle.setDocument = function( node ){
 			div.querySelectorAll("*,:x");
 			rbuggyQSA.push(",.*:");
 		});
+	}
+
+	if( (support.matchesSelector = rnative( (matches = docElem.matches ||
+			docElem.webkitMatchesSelector||
+			docElem.mozMatchesSelector ||
+			docElem.oMatchesSelector ||
+			docElem.msMatchesSelector) )) ){
+
+		assert(function( div ){
+
+		})
+
 	}
 
 
