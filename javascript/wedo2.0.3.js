@@ -112,13 +112,11 @@
         init: function (selector, context, rootjQuery) {//选择器，上下文，document
             var match, elem;
 
-            // HANDLE: $(""), $(null), $(undefined), $(false)
-            //如果无效直接返回;处理异常
+            //如果无效直接返回;处理异常 $(""), $(null), $(undefined), $(false)
             if (!selector) {
                 return this;
             }
 
-            // Handle HTML strings
             //处理HTML字符串
             if (typeof selector === "string") {//判断字符串
                 if (selector.charAt(0) === "<" && selector.charAt(selector.length - 1) === ">" && selector.length >= 3) {
@@ -220,13 +218,108 @@
 
             return jQuery.makeArray(selector, this);
             //返回一个数组出去
-        }
+        },
+        selector: "",
+        length: 0,
+        toArray:function(){
+        	return core_slice.call(this);
+        },
+        get:function( num ){
+        	return num == null ?
+        	this.toArray() :
+        	( num < 0 ? this[ this.length + num ] : this[ num ]);
+        },
+        pushStack:function( elems ){
+        	var ret = this.merge( this.constructor(), elems );
+        	ret.prevObject = this;
+        	ret.context = this.context;
+        	return ret;
+        },
+        each: function( callback, args ){
+        	return jQuery.each( this, callback, args );
+        },
+        ready: function( fn ){
+        	jQuery.ready.promise().done( fn );
+        	return this;
+        },
+        slice: function(){
+        	return this.pushStack( core_slice.apply( this, arguments ) );
+        },
+        first: function(){
+        	return this.eq(0);
+        },
+        last: function(){
+        	return this.eq(-1);
+        },
+        eq: function( i ){
+        	var len = this.length,
+        		j = +i + ( i < 0 ? len : 0 );
+        	return this.pushStack( j >= 0 && j < len ? [ this[ j ] ], []);
+        },
+        map:function( callback ){
+        	return this.pushStack( jQuery.map( this, function( ele, i ){
+        		return callback.call( elem, i, elem );
+        	}))
+        },
+        end: function(){
+        	return this.prevObject || this.constructor( null );
+        },
+        push: core_push,
+        sort:[].sort,
+        splice: [].splice;
 }
 //end 205 row
     //( 96, 283 ) 给jQuery对象的原型上绑定属性和方法;
     jQuery.fn.init.prototype = jQuery.fn;
     //(其实就是jQuery.prototype);
-
+	jQuery.extend = jQuery.fn.extend = function(){
+		var options, name, src, copy, copyIsArray, clone,
+		target = arguments[ 0 ] || {},
+		i = 1,
+		length = arguments.length,
+		deep = false;
+		
+		if( typeof target === 'boolean' ){
+			deep = target;
+			target = arguments[ 1 ] || {};
+			i = 2;
+		}
+		
+		if( typeof target !== "object" && jQuery.isFunction( target )){
+			target = {};
+		}
+		
+		if( length === i ){
+			target = this;
+			--i;
+		}
+		
+		for( ; i < length; ++i ){
+			if( ( options = arguments[ i ] ) != null ){
+				for( name in options ){
+					src = target[ name ];
+					copy = options[ name ];
+					
+					if( target == copy ){
+						continue;
+					}
+					
+					if( deep && copy && ( jQuery.isPlainObject( copy ) || copyIsArray = jQuery.isArray( copy ) ) ){
+						if( copyIsArray ){
+							copyIsArray = false;
+							clone = src && jQuery.isArray( src ) ? src : []; 
+						} else {
+							clone = src && jQuery.isPlainObject( src ) ? src : [];
+						}
+						target[ name ] = jQuery.extend( deep, clone, copy );
+					}else if( copy !== undefined){
+						target[ name ] = copy;
+					}
+				}
+			} 
+		}
+		return target;
+	}
     //( 285, 347 ) jQuery的extend方法
 
     //( 349, 817 ) 利用jQuery.extend 给构造函数绑定的静态方法;
