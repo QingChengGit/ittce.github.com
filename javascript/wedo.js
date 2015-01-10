@@ -920,6 +920,7 @@ setDocument = Sizzle.setDocument = function( node ){
 		});
 	}
 
+	if( (support.matchesSelector = rnative.test( (matches = docElem.matches ))))
 
 }
 })

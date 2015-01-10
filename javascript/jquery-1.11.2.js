@@ -1508,7 +1508,7 @@ Sizzle.error = function( msg ) {
 Sizzle.uniqueSort = function( results ) {
 	var elem,
 		duplicates = [],
-		j = 0,
+		 = 0,
 		i = 0;
 
 	// Unless we *know* we can detect duplicates, assume their presence
