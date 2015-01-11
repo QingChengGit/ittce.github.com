@@ -743,15 +743,15 @@ function slibingcheck( a, b ){
 
 function createInputPseudo ( type ){
 	return function( elem ){
-		var name = elem.nodeType.toLowerCase();
-		return name === "input" && elem.type = type;
+		var name = elem.nodeName.toLowerCase();
+		return name === "input" && elem.type === type;
 	}
 }
 
 function createButtonPseudo( type ){
 	return function( elem ){
-		var name = elem.nodeType.toLowerCase();
-		return ( name === "input" || name === "button" ) && elem.type = type;
+		var name = elem.nodeName.toLowerCase();
+		return ( name === "input" || name === "button" ) && elem.type === type;
 	}
 }
 
@@ -919,9 +919,6 @@ setDocument = Sizzle.setDocument = function( node ){
 			rbuggyQSA.push(",.*:");
 		});
 	}
-
-	if( (support.matchesSelector = rnative.test( (matches = docElem.matches ))))
-
 }
 })
 }))
