@@ -1,0 +1,80 @@
+@charset "utf-8";
+@import 'reset.scss';
+@import 'css3-mixins.scss';
+
+.box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  background-color: #ededed;
+}
+
+.banner {
+  height: 60%;
+  background: #2abba4 url(../images/banner.png) no-repeat 50% 50%;
+  @include background-size(contain);
+}
+
+ul {
+  height: 40%;
+  overflow: hidden;
+}
+
+li {
+  float: left;
+  width: 50%;
+  height: 50%;
+  box-sizing: border-box;
+}
+
+a, a:visited {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: #8d8d8d;
+  font-size: 12px;
+}
+
+// 让 a:before 支持样式.
+%function {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 10px;
+}
+
+%layout {
+  @include box(vertical, center, center);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+$icons: discovery, nearby, message, profile;
+@each $item in $icons {
+  .#{$item} div {
+    @extend %layout;
+    &:before {
+      background: url(../images/#{$item}.png) no-repeat 50% 50%;
+      background-size: 100%;
+      @extend %function;
+    }
+  }
+}
+
+// 分割线样式
+$border-style: 1px solid #e7e7e7;
+.discovery, .nearby {
+  border-bottom: $border-style;
+}
+
+.discovery, .message {
+  border-right: $border-style;
+}

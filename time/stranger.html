@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta content="telephone=no" name="format-detection" />
+  <title>他人资料</title>
+  <link rel="stylesheet" href="./css/all.css">
+</head>
+<body>
+<div class="box have-head">
+
+  <div class="head">
+    <a class="head-back icon-back" href="./index.html"><span>返回</span></a>
+    <h1 class="head-title">他人资料</h1>
+    <a class="head-more" data-do="show-menu">更多</a>
+  </div>
+
+  <div class="head-menu">
+    <ul>
+      <li data-do="follow">关注</li>
+      <li data-do="report">举报</li>
+    </ul>
+  </div>
+
+  <div class="page stranger">
+    <div class="inner">
+
+      <div class="profile">
+        <div class="hd">
+            <h1>朋友名称</h1>
+            <div class="price">
+              <p><span>10元</span>/<span>小时</span></p>
+            </div>
+        </div>
+        <div class="bd">
+          <div class="img"><img src="./images/demo.png"></div>
+          <p class="description">晚上一起吃小龙虾，看电影，然后逛, 再然后...</p>
+        </div>
+        <div class="ft">
+          <div class="profile-girl"><span class="age">24</span></div>
+        </div>
+      </div>
+
+      <div class="picture">
+        <h1>个人相册</h1>
+        <ul class="picture-list">
+          <li><img src="./images/pic-1.jpg" alt=""></li>
+          <li><img src="./images/pic-2.jpg" alt=""></li>
+          <li><img src="./images/pic-3.jpg" alt=""></li>
+          <li><img src="./images/pic-4.jpg" alt=""></li>
+        </ul>
+      </div>
+
+      <div class="about">
+
+        <dl class="birthday">
+          <dt>生日：</dt>
+          <dd>9月8日</dd>
+        </dl>
+
+        <dl class="star">
+          <dt>星座：</dt>
+          <dd>处女座</dd>
+        </dl>
+
+        <dl class="career">
+          <dt>职业：</dt>
+          <dd>白领</dd>
+        </dl>
+
+        <dl class="hobby">
+          <dt>爱好：</dt>
+          <dd>看电影</dd>
+          <dd>读书</dd>
+          <dd>跑步</dd>
+          <dd>旅行</dd>
+          <dd>篮球</dd>
+          <dd>音乐</dd>
+          <dd>音乐</dd>
+        </dl>
+
+        <dl class="other">
+          <dt >我愿意：</dt>
+          <dd style="background-color: #f4e1e1;">散步</dd>
+          <dd style="background-color: #f4e1e1;">聊天</dd>
+          <dd style="background-color: #e1f4f2">参加聚会</dd>
+          <dd style="background-color: #e1f4f2">吃饭</dd>
+          <dd style="background-color: #f4e1e1;">听音乐</dd>
+          <dd style="background-color: #e1f4f2">打游戏</dd>
+        </dl>
+      </div>
+
+      <div class="fans">
+        <dl>
+          <dt>粉丝：</dt>
+          <dd><span>21</span>人</dd>
+        </dl>
+      </div>
+
+      <a href="#" data-do="goto-request-editor">
+        <div class="make">申请约Ta</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="layer" id="layer-request">
+    <div class="mask" data-do="remove-layer"></div>
+    <div class="edit">
+      <form action="">
+        <div class="hd">
+          <h2>编辑邀请</h2>
+        </div>
+        <div class="bd">
+          <label class="price-label"><input type="text" id="price" placeholder="价格" autofocus></label>
+          <label>
+            <textarea name="request-message" id="request-message" placeholder="邀请信息"></textarea>
+          </label>
+        </div>
+        <div class="ft">
+          <button id="btn-send-request">发送</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="layer-message" id="layer-message">
+    <div class="tip">
+      <div class="from">
+        <span class="icon-boy"></span>
+      </div>
+      <div class="split"></div>
+      <div class="to">
+        <span class="icon-girl"></span>
+      </div>
+    </div>
+    <span>邀请已发送</span>
+  </div>
+
+</div>
+
+<script src="./script/zepto.js"></script>
+<script src="./script/light.js"></script>
+<script src="./script/touch.js"></script>
+<script src="./script/all.js"></script>
+
+</body>
+</html>

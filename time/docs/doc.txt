@@ -1,0 +1,32 @@
+
+Abcd9
+abcd987
+
+index.html -> nearby.html
+  -> stranger.html
+    1. 举报 - ping
+    2. 关注 - ping
+    3. 邀请/结果
+    (
+      邀请要表示啥? 是不是应该有特定的任务?
+      仅发送消息么?
+    )
+
+index.html -> message.html
+  -> message-info.html
+    1. 接受
+    2. 拒绝
+    (
+      应该是在处理任务?
+      各个操作的结果是啥?
+    )
+  -> contact.html
+    1. talk.html
+    2. profile.html(?)
+  -> talk.html
+
+index.html -> task.html
+  -> task-info.html
+    1. 报名
+    2. 评论/结果
+    3. 分享
