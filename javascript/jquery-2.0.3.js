@@ -65,6 +65,7 @@ var
 
 	// Used for matching numbers
 	core_pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
+	//返回正则的原文本;字符串
 
 	// Used for splitting on whitespace
 	core_rnotwhite = /\S+/g,

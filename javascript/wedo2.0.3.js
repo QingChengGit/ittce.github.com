@@ -102,7 +102,7 @@
             window.removeEventListener( "load", completed, false );
             jQuery.ready();
         };
-
+	//( 96, 283 ) 给jQuery对象的原型上绑定属性和方法;
     jQuery.fn = jQuery.prototype = {
         // The current version of jQuery being used
         jquery: core_version,
@@ -269,9 +269,11 @@
         splice: [].splice;
 }
 //end 205 row
-    //( 96, 283 ) 给jQuery对象的原型上绑定属性和方法;
-    jQuery.fn.init.prototype = jQuery.fn;
+    
     //(其实就是jQuery.prototype);
+    jQuery.fn.init.prototype = jQuery.fn;
+    
+     //( 285, 347 ) jQuery的extend方法
 	jQuery.extend = jQuery.fn.extend = function(){
 		var options, name, src, copy, copyIsArray, clone,
 		target = arguments[ 0 ] || {},
@@ -319,10 +321,359 @@
 			} 
 		}
 		return target;
-	}
-    //( 285, 347 ) jQuery的extend方法
-
+	};
+	
     //( 349, 817 ) 利用jQuery.extend 给构造函数绑定的静态方法;
+    jQuery.extend({
+    	//一个独立的随机数
+    	expando: "jQuery" + ( core_version + Math.random() ).replace(/\D/g,''),
+    	
+    	//用来解决冲突
+    	noConflict: function( deep ){
+    		if( window.$ === jQuery ){
+    			window.$ = _$;//如果window.$ === jQuery 把 widow.$赋值给保存的_$;
+    		}
+    		
+    		if( deep && window.jQuery === jQuery ){
+    			window.jQuery = _jQuery;
+    		}
+    		
+    		 return jQuery;
+    	},
+    	
+    	isReady: false,
+    	readyWait: 1,
+    	holdReady: function( hold ){
+    		if( hold ){
+    			jQuery.readyWait++;
+    		}else{
+    			 jQuery.ready( true );
+    		}
+    	},
+    	
+    	ready: function( wait ){
+    		if( wait === true ? jQuery.readyWait-- : jQuery.isReady ){
+    			return;
+    		}
+    		
+    		jQuery.isReady = true;
+    		
+    		if( wait !== true && --jQuery.readyWait > 0 ){
+    			return;
+    		}
+    		
+    		readyList.resolveWith( document, [ jQuery ] );
+    		
+    		if( jQuery.fn.trigger ){
+    			jQuery( document ).trigger('ready').off('ready');
+    		}
+    	},
+    	
+    	isFunction: function( obj ){
+    		return jQuery.type( obj ) === 'function';
+    	},
+    	
+    	isArray:Array.isArray,
+    	
+    	isWindow: function( obj ){
+    		return obj != null && obj === obj.window; 
+    	},
+    	
+    	isNumeric: function( obj ){
+    		//不是NaN并且是介于正负无穷之间的数字
+    		return !isNaN( parseFloat( obj ) ) && isFinite( obj );
+    	},
+    	
+    	type: function( obj ){
+    		if( obj == null ){
+    			return String( obj );
+    		}
+    		
+    		return typeof obj === 'object' || typeof obj === 'function' ?
+    			class2type[ core_toString.call( obj ) ] || 'object':
+    			typeof obj;
+    	},
+    	
+    	isPlainObject: function( obj ){
+    		if( jQuery.type( obj ) !== 'object' || obj.nodeType || jQuery.isWindow( obj ) ){
+    			return false;
+    		}
+    		
+    		try{
+    			if( obj.constructor && 
+    					!core_hasOwn.call( obj.constructor.prototype, "isPrototypeOf" ) ){
+					return false;	
+				}
+    		} catch( e ){
+    			return false;
+    		}
+    		
+    		return true;
+    	},
+    	
+    	isEmptyObject: function( obj ){
+    		var name;
+    		for( name in obj ){
+    			return false;
+    		}
+    		return true;
+    	},
+    	
+    	error:function( msg ){
+    		throw new Error( msg );
+    	},
+    	
+    	parseHTML: function( data, context, keepScripts ){
+    		if( !data || typeof data !== 'string' ){
+    			return null;
+    		}
+    		
+    		if( typeof context === 'boolean' ){
+    			keepScripts = context;
+    			context = false;
+    		}
+    		context = context || document;
+			
+			var parsed = rsingleTag.exec( data ),
+				script = !keepScripts || [];
+			
+			if( parsed ){
+				return [ context.createElement( parsed[1] ) ];
+			}
+			
+			parsed = jQuery.buildFragment( [ data ], context, scripts );
+			
+			if( scripts ){
+				jQuery( scripts ).remove();
+			}
+    		
+    		return jQuery.merge( [], parsed.childNode );
+    		
+    	},
+    	
+    	parseJSON: JSON.parse,
+    	
+    	parseXML: function( data ){
+    		var xml, tmp;
+    		if( !data : typeof data !== 'string' ){
+    			return null;
+    		}
+    		
+    		try{
+    			tmp = new DOMParser();
+    			
+    			xml = tmp.parseFromString（ data, "text/xml" );
+    		} catch( e ){
+    			xml = undefined;
+    		}
+    		
+    		if( !xml || xml.getElementsByTagName( 'parsererror' ).length ){
+    			jQuery.error( "Invalid XML" + data );
+    		}
+    		
+    		return xml;
+    		
+    	},
+    	
+    	noop: function(){},
+    	
+    	globalEval: function( code ){
+    		var script,
+    			indirect = eval;
+			
+			code = jQuery.trim( code );
+			
+			if( code ) {
+				if( code.indexOf( 'use strict' ) === 1 ){
+					script = document.createElement( script );
+					script.text = code;
+					document.head.appendChild( script ).parentNode.removeChild( script );
+				}else{
+					indirect( code );
+				}
+			}
+    	},
+    	
+    	camelCase: function( string ){
+    		return string.replace( rmsPrefix, 'ms-' ).replace( rdashAlpha, fcamelCase );
+    	},
+    	
+    	nodeName: function( elem, name ){
+    		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
+    	},
+    	
+    	each: function( obj, callback, args ){
+    		var value, 
+    			i = 0, 
+    			length = obj.length,
+    			isArray = isArraylike( obj );
+			
+			if( args ){
+				if( isArray ) {
+					for( ; i < length; i++ ){
+						value = callback.apply( obj[i], args );
+						
+						if( value === false ){
+							break;
+						}
+					}
+				} else {
+					for( i in obj ) {
+						value = callback( obj[i], args );
+						
+						if( value === false ){
+							break;
+						}
+					}
+				}
+			}else{
+				if( isArray ){
+					for( ; i < length; i++ ){
+						value = callback.call( obj[i], i, obj[i] );
+						
+						if( value === false ){
+							break;
+						}
+					}
+				}else{
+					for( i in obj ){
+						value = callback.call( obj[i], i, obj[i] );
+						
+						if( value === false ){
+							break;
+						}
+					}
+				}
+			}
+			return obj;	
+    	},
+    	
+    	trim: function( text ){
+    		return text == null ? '':core_trim.call( text );
+    	},
+    	
+    	makeArray: function( arr, results ){
+    		var ret = results || [];
+    		
+    		if( arr != null ){
+    			if( isArraylike( Object( arr ) ){
+    				jQuery.merge( ret, typeof arr === 'string' ? [arr] : arr );
+    			} else {
+    				core_push.call( ret, arr );
+    			}
+    		}
+    		
+    		return ret;
+    	},
+    	
+    	inArray: function( elem, arr, i ){
+    		return arr == null ? -1 : core_indexOf.call( arr, elem, i );
+    	},
+    	
+    	merge: function( first, second ){
+    		var l = second.length,
+    			i = first.length,
+    			j = 0;
+    			
+			if( typeof l === 'number' ){
+				for( ; j < l; j++ ){
+					first[ i++ ] = second[ j ];
+				}
+			} else {
+				while( second[j] !== undefined ){
+					first[ i++ ] = second[ j ];
+					j++;
+				}
+			}
+			
+			first.length = i;
+			return first;
+    	},
+    	
+    	grep: function( elems, callback, inv ){
+    		var retVal,
+    			ret = [],
+    			i = 0,
+    			length = elems.length;
+    			inv = !!inv;
+			
+			for( ; i < length; i++ ){
+				retVal = !!callback( elems[i], i );
+				if( inv !== retVal ){
+					ret.push( elems[i] );
+				}
+			}
+			return ret;
+    	},
+    	
+    	map: function( elems, callback, args ){
+    		var value, 
+    			i = 0,
+    			length = elems.length,
+    			isArray = isArraylike( elems ),
+    			ret = [];
+    			
+			if( isArray ){
+				for( ; i < length; i++ ){
+					value = callback( elems[i], i, args );
+					
+					if( value != null ){
+						ret[ ret.length ] = value;
+					}
+				}
+			}else{
+				for( i in elems ){
+					value = callback( elems[i], i, args );
+					
+					if( value != null ){
+						ret[ ret.length ] = value;
+					}
+				}
+			}
+			
+			return core_concat.apply( [], ret );
+    	},
+    	
+    	guid: 1,
+    	
+    	proxy: function( fn, context ){
+    		var tmp, arg, proxy;
+    		
+    		if( typeof context === 'string' ){
+    			tmp = fn[context];
+    			context = fn;
+    			fn = tmp;
+    		}
+    		
+    		if( jQuery.isFunction( fn ) ){
+    			return undefined;
+    		}
+    		
+    		args = core_slice.call( arguments, 2 );
+    		
+    		proxy = function(){
+    			return fn.apply( context || this, args.concat(core_slice.call( arguments ) ) );
+    		}
+    		
+    		proxy.guid = fn.guid = fn.guid || jQuery.guid++;
+    		
+    		return proxy;
+    		
+    	},
+    	
+    	access:function(){
+    		
+    	}
+    
+    
+    	
+    
+    	
+    });
+    
+	
+   
+
 
     //( 877, 2845 ) jQuery的Sizzle选择引擎;
 
